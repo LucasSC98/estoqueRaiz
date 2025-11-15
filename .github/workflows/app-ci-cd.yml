@@ -127,7 +127,7 @@ jobs:
   deploy-staging:
     name: Deploy Staging
     runs-on: ubuntu-latest
-    needs: [build-android]
+    needs: [build]
     if: github.ref == 'refs/heads/develop'
     environment:
       name: app-staging
@@ -151,7 +151,7 @@ jobs:
   deploy-production:
     name: Deploy Production
     runs-on: ubuntu-latest
-    needs: [build-android, build-ios]
+    needs: [build]
     if: github.ref == 'refs/heads/main'
     environment:
       name: app-production
@@ -165,12 +165,6 @@ jobs:
         with:
           expo-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Download Android APK
-        uses: actions/download-artifact@v4
-        with:
-          name: app-android
-          path: ./artifacts
 
       - name: Publish para Expo Production
         working-directory: ./app-estoqueraiz
