@@ -37,10 +37,11 @@ out/
 # Databases
 *.sqlite
 *.sqlite3
+*.sql
+
 
 # Scripts temporários
 gerar-hash.js
-seed-data.js
 
 # Docker (opcional - se quiser versionar)
 # docker-compose.override.yml
