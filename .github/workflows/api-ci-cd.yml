@@ -11,6 +11,10 @@ on:
     paths:
       - 'api-estoqueraiz/**'
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   DOCKER_REGISTRY: ghcr.io
   IMAGE_PREFIX: ${{ github.repository_owner }}/estoqueraiz

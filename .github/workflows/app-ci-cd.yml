@@ -11,6 +11,10 @@ on:
     paths:
       - 'app-estoqueraiz/**'
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     name: Build e Test
