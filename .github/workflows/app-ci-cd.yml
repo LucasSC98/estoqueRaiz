@@ -136,17 +136,12 @@ jobs:
       - name: Checkout codigo
         uses: actions/checkout@v4
 
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Publish para Expo Staging
+      - name: Deploy Staging
         working-directory: ./app-estoqueraiz
         run: |
-          echo "Publicando app para canal staging"
-          npx expo publish --release-channel staging
+          echo "Deploy staging seria feito aqui"
+          echo "Comando: eas update --branch staging"
+          echo "Requer configuracao EAS no projeto"
 
   deploy-production:
     name: Deploy Production
@@ -160,26 +155,13 @@ jobs:
       - name: Checkout codigo
         uses: actions/checkout@v4
 
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Publish para Expo Production
+      - name: Deploy Production
         working-directory: ./app-estoqueraiz
         run: |
-          echo "Publicando app para canal production"
-          npx expo publish --release-channel production
-
-      - name: Submit para Google Play
-        working-directory: ./app-estoqueraiz
-        run: |
-          echo "Submetendo para Google Play Store"
-          echo "Utilizando: npx expo submit --platform android"
-
-      - name: Submit para App Store
-        working-directory: ./app-estoqueraiz
+          echo "Deploy production seria feito aqui"
+          echo "Comando: eas update --branch production"
+          echo "Ou: eas build --platform android --auto-submit"
+          echo "Requer configuracao EAS no projeto"
         run: |
           echo "Submetendo para Apple App Store"
           echo "Utilizando: npx expo submit --platform ios"
