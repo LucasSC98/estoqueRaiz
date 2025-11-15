@@ -162,6 +162,3 @@ jobs:
           echo "Comando: eas update --branch production"
           echo "Ou: eas build --platform android --auto-submit"
           echo "Requer configuracao EAS no projeto"
-        run: |
-          echo "Submetendo para Apple App Store"
-          echo "Utilizando: npx expo submit --platform ios"
