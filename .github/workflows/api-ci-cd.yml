@@ -4,12 +4,12 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'api-estoqueraiz/**'
-      - '.github/workflows/api-ci-cd.yml'
+      - "api-estoqueraiz/**"
+      - ".github/workflows/api-ci-cd.yml"
   pull_request:
     branches: [main, develop]
     paths:
-      - 'api-estoqueraiz/**'
+      - "api-estoqueraiz/**"
 
 permissions:
   contents: read
@@ -20,10 +20,10 @@ env:
   IMAGE_PREFIX: ${{ github.repository_owner }}/estoqueraiz
 
 jobs:
-  build:
-    name: Build e Test
+  security-check:
+    name: Security Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4
@@ -31,8 +31,41 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+
+      - name: Audit dependencias vulnerabilidades
+        working-directory: ./api-estoqueraiz
+        run: |
+          npm audit --audit-level=moderate || true
+          cd shared && npm audit --audit-level=moderate || true
+          cd ../auth-service && npm audit --audit-level=moderate || true
+
+      - name: Verificar secrets expostos
+        run: |
+          echo "Verificando secrets hardcoded..."
+          ! grep -r "password.*=.*['\"]" api-estoqueraiz/ --include="*.ts" --include="*.js" || echo "AVISO: Possível senha hardcoded"
+          ! grep -r "apiKey.*=.*['\"]" api-estoqueraiz/ --include="*.ts" --include="*.js" || echo "AVISO: Possível API key hardcoded"
+          ! grep -r "secret.*=.*['\"]" api-estoqueraiz/ --include="*.ts" --include="*.js" || echo "AVISO: Possível secret hardcoded"
+
+      - name: Verificar dependencias desatualizadas
+        working-directory: ./api-estoqueraiz/shared
+        run: |
+          npm outdated || true
+
+  build:
+    name: Build e Test
+    runs-on: ubuntu-latest
+    needs: security-check
+
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: api-estoqueraiz/shared/package-lock.json
 
       - name: Instalar dependencias shared
@@ -104,10 +137,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'push'
-    
+
     strategy:
       matrix:
-        service: 
+        service:
           - auth-service
           - categorias-service
           - produtos-service
@@ -115,7 +148,7 @@ jobs:
           - unidades-service
           - movimentacoes-service
           - relatorios-service
-    
+
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4
@@ -159,7 +192,7 @@ jobs:
     environment:
       name: staging
       url: https://staging-api.estoqueraiz.com
-    
+
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4
@@ -177,7 +210,7 @@ jobs:
     environment:
       name: production
       url: https://api.estoqueraiz.com
-    
+
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4
@@ -210,7 +243,7 @@ jobs:
     needs: deploy-production
     environment:
       name: production
-    
+
     steps:
       - name: Rollback para versao anterior
         run: |

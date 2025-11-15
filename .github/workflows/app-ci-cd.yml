@@ -4,12 +4,12 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'app-estoqueraiz/**'
-      - '.github/workflows/app-ci-cd.yml'
+      - "app-estoqueraiz/**"
+      - ".github/workflows/app-ci-cd.yml"
   pull_request:
     branches: [main, develop]
     paths:
-      - 'app-estoqueraiz/**'
+      - "app-estoqueraiz/**"
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ jobs:
   build:
     name: Build e Test
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4
@@ -27,8 +27,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: app-estoqueraiz/package-lock.json
 
       - name: Instalar dependencias
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'push'
-    
+
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4
@@ -56,15 +56,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: app-estoqueraiz/package-lock.json
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Setup Expo
         uses: expo/expo-github-action@v8
@@ -95,7 +95,7 @@ jobs:
     runs-on: macos-latest
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4
@@ -103,8 +103,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: app-estoqueraiz/package-lock.json
 
       - name: Setup Expo
@@ -131,7 +131,7 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     environment:
       name: app-staging
-    
+
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4
@@ -150,7 +150,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment:
       name: app-production
-    
+
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4

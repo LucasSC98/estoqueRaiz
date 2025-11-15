@@ -18,10 +18,7 @@ router.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", service: "usuarios" });
 });
 
-// Rotas públicas para comunicação entre microserviços
-router.get("/internal/:id", buscarUsuario); // Sem autenticação para uso interno
-
-// Rotas com autenticação
+router.get("/internal/:id", buscarUsuario);
 router.post("/", criarUsuario);
 router.get("/", autenticacao, listarUsuarios);
 router.get("/pendentes", autenticacao, apenasGerente, listarPendentes);
