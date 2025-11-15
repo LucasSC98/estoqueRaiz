@@ -1,0 +1,119 @@
+global:
+  scrape_interval: 15s # Coleta métricas a cada 15 segundos
+  evaluation_interval: 15s # Avalia regras a cada 15 segundos
+  scrape_timeout: 10s
+
+  external_labels:
+    monitor: "estoque-raiz-monitor"
+    environment: "production"
+
+# Carrega regras de alertas
+rule_files:
+  - "alerts.yml"
+
+# Configuração de Alertmanager (opcional - descomente se usar)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#             - alertmanager:9093
+
+# Configuração dos alvos para coleta de métricas
+scrape_configs:
+  # Prometheus (auto-monitoramento)
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+        labels:
+          service: "prometheus"
+
+  # Node Exporter (métricas do host)
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+        labels:
+          service: "node-exporter"
+
+  # cAdvisor (métricas de containers)
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+        labels:
+          service: "cadvisor"
+
+  # Auth Service
+  - job_name: "auth-service"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["auth-service:3001"]
+        labels:
+          service: "auth-service"
+          tier: "backend"
+    metrics_path: "/metrics"
+
+  # Usuarios Service
+  - job_name: "usuarios-service"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["usuarios-service:3002"]
+        labels:
+          service: "usuarios-service"
+          tier: "backend"
+    metrics_path: "/metrics"
+
+  # Unidades Service
+  - job_name: "unidades-service"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["unidades-service:3003"]
+        labels:
+          service: "unidades-service"
+          tier: "backend"
+    metrics_path: "/metrics"
+
+  # Categorias Service
+  - job_name: "categorias-service"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["categorias-service:3004"]
+        labels:
+          service: "categorias-service"
+          tier: "backend"
+    metrics_path: "/metrics"
+
+  # Produtos Service
+  - job_name: "produtos-service"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["produtos-service:3005"]
+        labels:
+          service: "produtos-service"
+          tier: "backend"
+    metrics_path: "/metrics"
+
+  # Movimentacoes Service
+  - job_name: "movimentacoes-service"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["movimentacoes-service:3006"]
+        labels:
+          service: "movimentacoes-service"
+          tier: "backend"
+    metrics_path: "/metrics"
+
+  # Relatorios Service
+  - job_name: "relatorios-service"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["relatorios-service:3007"]
+        labels:
+          service: "relatorios-service"
+          tier: "backend"
+    metrics_path: "/metrics"
+
+  # Redis (se exportar métricas - requer redis_exporter)
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
+  #       labels:
+  #         service: 'redis'

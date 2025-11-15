@@ -1,0 +1,327 @@
+groups:
+  - name: disponibilidade
+    interval: 30s
+    rules:
+      - alert: ServicoForaDoAr
+        expr: up{job=~".*-service"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "Serviço {{ $labels.job }} está fora do ar"
+          description: "O serviço {{ $labels.job }} não responde há 2 minutos. Valor: {{ $value }}"
+          runbook_url: "https://github.com/empresa/runbooks/servico-indisponivel.md"
+
+      - alert: RedisIndisponivel
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "Redis está indisponível"
+          description: "O Redis não responde há 1 minuto. Isso afeta cache de todos os serviços."
+
+      - alert: PrometheusForaDoAr
+        expr: up{job="prometheus"} == 0
+        for: 1m
+        labels:
+          severity: warning
+          category: monitoring
+        annotations:
+          summary: "Prometheus parou de coletar métricas"
+          description: "O próprio Prometheus está com problemas."
+
+  # ==================== ALERTAS DE LATÊNCIA ====================
+  - name: latencia
+    interval: 1m
+    rules:
+      - alert: LatenciaAlta
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service)
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "Latência P95 alta no serviço {{ $labels.service }}"
+          description: "Latência P95 está em {{ $value }}s (> 2s) nos últimos 5 minutos."
+
+      - alert: LatenciaCritica
+        expr: |
+          histogram_quantile(0.99, 
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service)
+          ) > 5
+        for: 10m
+        labels:
+          severity: critical
+          category: performance
+        annotations:
+          summary: "Latência P99 crítica no serviço {{ $labels.service }}"
+          description: "Latência P99 está em {{ $value }}s (> 5s) nos últimos 10 minutos."
+
+      - alert: RequisicaoLenta
+        expr: |
+          http_request_duration_seconds{quantile="0.95"} > 1
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "Requisições lentas em {{ $labels.route }}"
+          description: "95% das requisições para {{ $labels.route }} estão acima de 1s."
+
+  # ==================== ALERTAS DE TAXA DE ERRO ====================
+  - name: erros
+    interval: 1m
+    rules:
+      - alert: TaxaDeErro5xxAlta
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (service) /
+            sum(rate(http_requests_total[5m])) by (service)
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          category: errors
+        annotations:
+          summary: "Taxa de erro 5xx acima de 5% no {{ $labels.service }}"
+          description: "{{ $value | humanizePercentage }} das requisições estão retornando erro 5xx."
+
+      - alert: TaxaDeErro5xxModerada
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (service) /
+            sum(rate(http_requests_total[5m])) by (service)
+          ) > 0.01
+        for: 10m
+        labels:
+          severity: warning
+          category: errors
+        annotations:
+          summary: "Taxa de erro 5xx acima de 1% no {{ $labels.service }}"
+          description: "{{ $value | humanizePercentage }} das requisições estão retornando erro 5xx."
+
+      - alert: ErrosConsecutivos
+        expr: |
+          increase(http_server_errors_total[5m]) > 50
+        for: 2m
+        labels:
+          severity: warning
+          category: errors
+        annotations:
+          summary: "Mais de 50 erros 5xx em 5 minutos no {{ $labels.service }}"
+          description: "Detectados {{ $value }} erros consecutivos."
+
+  # ==================== ALERTAS DE RECURSOS (CPU/MEMÓRIA) ====================
+  - name: recursos
+    interval: 1m
+    rules:
+      - alert: CPUAlta
+        expr: |
+          100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 15m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "Uso de CPU alto no host {{ $labels.instance }}"
+          description: "CPU em {{ $value }}% há 15 minutos."
+
+      - alert: CPUCritica
+        expr: |
+          100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 5m
+        labels:
+          severity: critical
+          category: resources
+        annotations:
+          summary: "Uso de CPU crítico no host {{ $labels.instance }}"
+          description: "CPU em {{ $value }}% há 5 minutos."
+
+      - alert: MemoriaAlta
+        expr: |
+          (
+            (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 
+            node_memory_MemTotal_bytes
+          ) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "Uso de memória alto no host {{ $labels.instance }}"
+          description: "Memória em {{ $value }}% há 10 minutos."
+
+      - alert: MemoriaCritica
+        expr: |
+          (
+            (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 
+            node_memory_MemTotal_bytes
+          ) * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+          category: resources
+        annotations:
+          summary: "Uso de memória crítico no host {{ $labels.instance }}"
+          description: "Memória em {{ $value }}% há 5 minutos. Risco de OOM Kill!"
+
+      - alert: DiscoAlto
+        expr: |
+          (
+            (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_avail_bytes{mountpoint="/"}) /
+            node_filesystem_size_bytes{mountpoint="/"}
+          ) * 100 > 80
+        for: 15m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "Disco quase cheio em {{ $labels.instance }}"
+          description: "Disco em {{ $value }}% de uso."
+
+  # ==================== ALERTAS DE CACHE (REDIS) ====================
+  - name: cache
+    interval: 1m
+    rules:
+      - alert: CacheHitRateBaixo
+        expr: |
+          (
+            sum(rate(cache_hits_total[5m])) /
+            (sum(rate(cache_hits_total[5m])) + sum(rate(cache_misses_total[5m])))
+          ) * 100 < 60
+        for: 30m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "Taxa de acerto do cache abaixo de 60%"
+          description: "Cache hit rate em {{ $value }}%. Revisar estratégia de cache."
+
+      - alert: RedisMemoriaAlta
+        expr: |
+          redis_memory_used_bytes / redis_memory_max_bytes * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "Memória do Redis acima de 80%"
+          description: "Redis usando {{ $value }}% da memória máxima."
+
+      - alert: RedisClientesAlto
+        expr: |
+          redis_connected_clients > 100
+        for: 5m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "Muitos clientes conectados ao Redis"
+          description: "{{ $value }} clientes conectados. Investigar possível vazamento de conexões."
+
+  # ==================== ALERTAS DE CIRCUIT BREAKER ====================
+  - name: circuit_breaker
+    interval: 30s
+    rules:
+      - alert: CircuitBreakerAberto
+        expr: |
+          circuit_breaker_state == 2
+        for: 2m
+        labels:
+          severity: critical
+          category: resilience
+        annotations:
+          summary: "Circuit breaker {{ $labels.circuit_breaker }} está ABERTO"
+          description: "O circuit breaker está bloqueando requisições há 2 minutos."
+
+      - alert: CircuitBreakerInstavel
+        expr: |
+          rate(circuit_breaker_events_total{event="open"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          category: resilience
+        annotations:
+          summary: "Circuit breaker {{ $labels.circuit_breaker }} instável"
+          description: "Circuit breaker abrindo frequentemente. Taxa: {{ $value }}/s"
+
+  # ==================== ALERTAS DE NEGÓCIO ====================
+  - name: negocio
+    interval: 5m
+    rules:
+      - alert: ProdutosEstoqueBaixo
+        expr: |
+          produtos_estoque_total < 10
+        for: 1h
+        labels:
+          severity: info
+          category: business
+        annotations:
+          summary: "Produto {{ $labels.produto_id }} com estoque baixo"
+          description: "Apenas {{ $value }} unidades em estoque na unidade {{ $labels.unidade_id }}."
+
+      - alert: MovimentacoesAnormais
+        expr: |
+          rate(movimentacoes_total[1h]) > 100
+        for: 30m
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "Taxa anormal de movimentações"
+          description: "{{ $value }} movimentações/hora. Investigar se há problema."
+
+      - alert: FalhasAutenticacaoAltas
+        expr: |
+          rate(usuarios_autenticados_total[5m]) < 0.5 and
+          rate(http_requests_total{route="/api/auth/login"}[5m]) > 1
+        for: 10m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "Taxa de falhas de autenticação alta"
+          description: "Muitas tentativas de login sem sucesso. Possível ataque de força bruta."
+
+  # ==================== ALERTAS DE CONTAINER ====================
+  - name: containers
+    interval: 1m
+    rules:
+      - alert: ContainerReiniciando
+        expr: |
+          rate(container_last_seen[5m]) > 2
+        for: 5m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "Container {{ $labels.name }} reiniciando frequentemente"
+          description: "Container está crashando e reiniciando. Investigar logs."
+
+      - alert: ContainerCPUAlta
+        expr: |
+          rate(container_cpu_usage_seconds_total{name=~".*-service"}[5m]) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "Container {{ $labels.name }} com CPU alta"
+          description: "CPU do container em {{ $value }}%."
+
+      - alert: ContainerMemoriaAlta
+        expr: |
+          (container_memory_usage_bytes{name=~".*-service"} / container_spec_memory_limit_bytes) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "Container {{ $labels.name }} com memória alta"
+          description: "Memória do container em {{ $value }}%."

@@ -1,0 +1,46 @@
+# Dependências
+node_modules/
+dist/
+
+# Ambiente
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Logs
+logs/
+*.log
+npm-debug.log
+yarn-error.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+build/
+.cache/
+.next/
+out/
+.tmp/
+*.tsbuildinfo
+
+# Databases
+*.sqlite
+*.sqlite3
+
+# Scripts temporários
+gerar-hash.js
+seed-data.js
+
+# Docker (opcional - se quiser versionar)
+# docker-compose.override.yml
+
+docs/
