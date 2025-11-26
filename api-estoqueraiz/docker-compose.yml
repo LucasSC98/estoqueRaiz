@@ -179,10 +179,12 @@ services:
   produtos-service:
     build:
       context: .
-      dockerfile: ./produtos-service/Dockerfile
+      dockerfile: produtos-service/Dockerfile
     container_name: produtos-service
     ports:
-      - "${PRODUTOS_SERVICE_PORT:-3005}:3005"
+      - "3005:3005"
+    volumes:
+      - ./produtos-service/uploads:/app/uploads
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - PORT=3005
@@ -357,3 +359,5 @@ volumes:
   redis-data:
   prometheus-data:
   grafana-data:
+  produtos-uploads:
+  postgres-data:

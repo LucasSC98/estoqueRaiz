@@ -19,7 +19,6 @@ import {
 export class ProdutosService {
   private async buscarDadosRelacionados(produtoJson: any): Promise<any> {
     try {
-      // Buscar categoria usando rota interna (sem autenticação)
       if (produtoJson.categoria_id) {
         try {
           const categoriaUrl = `http://categorias-service:3004/api/categorias/internal/${produtoJson.categoria_id}`;
@@ -43,7 +42,6 @@ export class ProdutosService {
         }
       }
 
-      // Buscar unidade usando rota interna (sem autenticação)
       if (produtoJson.unidade_id) {
         try {
           const unidadeUrl = `http://unidades-service:3003/api/unidades/internal/${produtoJson.unidade_id}`;
@@ -67,7 +65,6 @@ export class ProdutosService {
         }
       }
 
-      // Buscar usuário usando rota interna (sem autenticação)
       if (produtoJson.usuario_id) {
         try {
           const usuarioUrl = `http://usuarios-service:3002/api/usuarios/internal/${produtoJson.usuario_id}`;
@@ -120,7 +117,6 @@ export class ProdutosService {
           order: [["nome", "ASC"]],
         });
 
-        // Buscar dados relacionados para cada produto
         const produtosComRelacionamentos = await Promise.all(
           produtos.map(async (produto: any) => {
             const produtoJson = produto.toJSON();

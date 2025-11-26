@@ -29,10 +29,19 @@ export const criarProduto = asyncHandler(
   async (req: Request, res: Response) => {
     const { nome } = req.body;
     logger.info(`Criando produto: ${nome}`);
-    const produto = await produtosService.criar({
+
+    let dadosProduto = {
       ...req.body,
       usuario_id: req.usuario?.id,
-    });
+    };
+
+    if (req.file) {
+      dadosProduto.imagem_url = `/uploads/${req.file.filename}`;
+      logger.info(`Imagem recebida: ${req.file.filename}`);
+    }
+
+    const produto = await produtosService.criar(dadosProduto);
+
     res.status(201).json({
       message: "Produto criado com sucesso",
       produto,
@@ -44,7 +53,19 @@ export const atualizarProduto = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
     logger.info(`Atualizando produto ID: ${id}`);
-    const produto = await produtosService.atualizar(parseInt(id), req.body);
+
+    let dadosAtualizacao = { ...req.body };
+
+    if (req.file) {
+      dadosAtualizacao.imagem_url = `/uploads/${req.file.filename}`;
+      logger.info(`Nova imagem recebida: ${req.file.filename}`);
+    }
+
+    const produto = await produtosService.atualizar(
+      parseInt(id),
+      dadosAtualizacao
+    );
+
     res.json({
       message: "Produto atualizado com sucesso",
       produto,

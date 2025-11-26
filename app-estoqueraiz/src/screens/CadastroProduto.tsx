@@ -29,6 +29,10 @@ type CadastroProdutoRouteProp = RouteProp<
   "CadastroProduto"
 >;
 
+const FORMATOS_PERMITIDOS = ["jpg", "jpeg", "png", "gif", "webp"];
+const TAMANHO_MAXIMO_MB = 5;
+const TAMANHO_MAXIMO_BYTES = TAMANHO_MAXIMO_MB * 1024 * 1024;
+
 export default function CadastroProduto() {
   const route = useRoute<CadastroProdutoRouteProp>();
   const navigation = useNavigation();
@@ -117,6 +121,67 @@ export default function CadastroProduto() {
     const dia = partes[2];
 
     return `${dia}/${mes}/${ano}`;
+  };
+
+  const validarFormatoImagem = (uri: string): boolean => {
+    const extensao = uri.split(".").pop()?.toLowerCase();
+    if (!extensao || !FORMATOS_PERMITIDOS.includes(extensao)) {
+      Toast.show({
+        type: "error",
+        text1: "Formato Inválido",
+        text2: `Apenas imagens ${FORMATOS_PERMITIDOS.join(
+          ", "
+        )} são permitidas`,
+        position: "top",
+        visibilityTime: 4000,
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const validarTamanhoImagem = async (uri: string): Promise<boolean> => {
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const tamanhoBytes = blob.size;
+
+      if (tamanhoBytes > TAMANHO_MAXIMO_BYTES) {
+        const tamanhoMB = (tamanhoBytes / (1024 * 1024)).toFixed(2);
+        Toast.show({
+          type: "error",
+          text1: "Imagem Muito Grande",
+          text2: `Tamanho: ${tamanhoMB}MB. Máximo permitido: ${TAMANHO_MAXIMO_MB}MB`,
+          position: "top",
+          visibilityTime: 4000,
+        });
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Erro ao validar tamanho da imagem:", error);
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Não foi possível validar o tamanho da imagem",
+        position: "top",
+        visibilityTime: 3000,
+      });
+      return false;
+    }
+  };
+
+  const validarImagemCompleta = async (uri: string): Promise<boolean> => {
+    if (!validarFormatoImagem(uri)) {
+      return false;
+    }
+
+    const tamanhoValido = await validarTamanhoImagem(uri);
+    if (!tamanhoValido) {
+      return false;
+    }
+
+    return true;
   };
 
   async function carregarDadosIniciais(
@@ -219,7 +284,6 @@ export default function CadastroProduto() {
       setInicializado(true);
       verificarLogin();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inicializado]);
 
   useEffect(() => {
@@ -374,6 +438,14 @@ export default function CadastroProduto() {
       return;
     }
 
+    if (imagemLocal && !(await validarImagemCompleta(imagemLocal))) {
+      return;
+    }
+
+    if (imagemUrl && !validarFormatoImagem(imagemUrl)) {
+      return;
+    }
+
     try {
       const dados: any = {
         nome: nome.trim(),
@@ -499,10 +571,23 @@ export default function CadastroProduto() {
       });
 
       if (!result.canceled) {
-        setImagemLocal(result.assets[0].uri);
-        setImagemUrl("");
+        const uri = result.assets[0].uri;
+
+        if (await validarImagemCompleta(uri)) {
+          setImagemLocal(uri);
+          setImagemUrl("");
+
+          Toast.show({
+            type: "success",
+            text1: "Imagem Selecionada",
+            text2: "Imagem válida adicionada com sucesso!",
+            position: "top",
+            visibilityTime: 2000,
+          });
+        }
       }
-    } catch {
+    } catch (error) {
+      console.error("Erro ao selecionar imagem:", error);
       Toast.show({
         type: "error",
         text1: "Erro",
@@ -537,10 +622,23 @@ export default function CadastroProduto() {
       });
 
       if (!result.canceled) {
-        setImagemLocal(result.assets[0].uri);
-        setImagemUrl("");
+        const uri = result.assets[0].uri;
+
+        if (await validarImagemCompleta(uri)) {
+          setImagemLocal(uri);
+          setImagemUrl("");
+
+          Toast.show({
+            type: "success",
+            text1: "Foto Capturada",
+            text2: "Foto válida adicionada com sucesso!",
+            position: "top",
+            visibilityTime: 2000,
+          });
+        }
       }
-    } catch {
+    } catch (error) {
+      console.error("Erro ao tirar foto:", error);
       Toast.show({
         type: "error",
         text1: "Erro",
@@ -554,8 +652,26 @@ export default function CadastroProduto() {
 
   const adicionarImagemPorUrl = (url: string) => {
     if (url.trim()) {
-      setImagemUrl(url.trim());
-      setImagemLocal(null);
+      if (validarFormatoImagem(url.trim())) {
+        setImagemUrl(url.trim());
+        setImagemLocal(null);
+
+        Toast.show({
+          type: "success",
+          text1: "URL Adicionada",
+          text2: "URL da imagem validada com sucesso!",
+          position: "top",
+          visibilityTime: 2000,
+        });
+      }
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Digite uma URL válida!",
+        position: "top",
+        visibilityTime: 3000,
+      });
     }
     setModalUrlVisivel(false);
   };
@@ -563,6 +679,13 @@ export default function CadastroProduto() {
   const removerImagem = () => {
     setImagemUrl("");
     setImagemLocal(null);
+    Toast.show({
+      type: "info",
+      text1: "Imagem Removida",
+      text2: "A imagem foi removida do produto",
+      position: "top",
+      visibilityTime: 2000,
+    });
   };
 
   if (!fontesCarregadas) return null;
@@ -712,6 +835,10 @@ export default function CadastroProduto() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Imagem do Produto</Text>
+            <Text style={styles.infoFormato}>
+              Formatos: {FORMATOS_PERMITIDOS.join(", ")} | Máx:{" "}
+              {TAMANHO_MAXIMO_MB}MB
+            </Text>
 
             {imagemLocal || imagemUrl ? (
               <View style={styles.containerImagem}>
@@ -790,10 +917,12 @@ export default function CadastroProduto() {
                 }}
               >
                 <MaterialIcons name="link" size={32} color="#2196F3" />
-                <Text style={styles.textoOpcaoImagem}>URL da Imagem</Text>
-                <Text style={styles.subtextoOpcaoImagem}>
-                  Inserir link de uma imagem
-                </Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.textoOpcaoImagem}>URL da Imagem</Text>
+                  <Text style={styles.subtextoOpcaoImagem}>
+                    Inserir link de uma imagem
+                  </Text>
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -804,10 +933,12 @@ export default function CadastroProduto() {
                 }}
               >
                 <MaterialIcons name="photo-library" size={32} color="#4CAF50" />
-                <Text style={styles.textoOpcaoImagem}>Galeria</Text>
-                <Text style={styles.subtextoOpcaoImagem}>
-                  Escolher da galeria de fotos
-                </Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.textoOpcaoImagem}>Galeria</Text>
+                  <Text style={styles.subtextoOpcaoImagem}>
+                    Escolher da galeria de fotos
+                  </Text>
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -818,10 +949,12 @@ export default function CadastroProduto() {
                 }}
               >
                 <MaterialIcons name="camera-alt" size={32} color="#FF9800" />
-                <Text style={styles.textoOpcaoImagem}>Câmera</Text>
-                <Text style={styles.subtextoOpcaoImagem}>
-                  Tirar uma nova foto
-                </Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.textoOpcaoImagem}>Câmera</Text>
+                  <Text style={styles.subtextoOpcaoImagem}>
+                    Tirar uma nova foto
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
           </View>
@@ -845,6 +978,9 @@ export default function CadastroProduto() {
 
             <View style={styles.corpoModal}>
               <Text style={styles.rotuloModal}>Cole o link da imagem:</Text>
+              <Text style={styles.infoFormato}>
+                Formatos aceitos: {FORMATOS_PERMITIDOS.join(", ")}
+              </Text>
               <Input
                 placeholder="https://exemplo.com/imagem.jpg"
                 value={imagemUrl}
@@ -906,6 +1042,12 @@ const styles = StyleSheet.create({
     fontFamily: "NunitoSans_600SemiBold",
     color: "#374151",
     marginBottom: 8,
+  },
+  infoFormato: {
+    fontSize: 12,
+    color: "#6B7280",
+    marginBottom: 8,
+    fontStyle: "italic",
   },
   input: {
     height: 52,
@@ -1089,7 +1231,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: "50%",
+    maxHeight: "60%",
   },
   cabecalhoModal: {
     flexDirection: "row",
@@ -1115,7 +1257,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#111827",
-    marginBottom: 12,
+    marginBottom: 8,
     fontFamily: "NunitoSans_600SemiBold",
   },
   entradaModal: {

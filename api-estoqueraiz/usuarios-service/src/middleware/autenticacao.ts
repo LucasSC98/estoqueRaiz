@@ -1,3 +1,5 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 import { Request, Response, NextFunction } from "express";
 import {
   ErroNaoAutorizado,
@@ -5,7 +7,7 @@ import {
 } from "../../../shared/utils/tratamentoErros";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "uma_senha_boa_e_segura";
+const JWT_SECRET = process.env.JWT_SECRET || "uma_senha_pica_secreta";
 
 interface PayloadToken {
   id: number;

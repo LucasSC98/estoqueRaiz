@@ -16,6 +16,7 @@ import {
   apenasEstoquistaOuGerente,
   verificarAcessoUnidade,
 } from "../middleware/autorizacao";
+import { upload, handleMulterError } from "../utils/uploadImagem";
 
 const router = Router();
 
@@ -27,9 +28,17 @@ router.post(
   autenticacao,
   apenasEstoquistaOuGerente,
   verificarAcessoUnidade,
+  upload.single("imagem"),
+  handleMulterError,
   criarProduto
 );
-router.put("/:id", autenticacao, atualizarProduto);
+router.put(
+  "/:id",
+  autenticacao,
+  upload.single("imagem"),
+  handleMulterError,
+  atualizarProduto
+);
 router.delete("/:id", autenticacao, apenasGerente, deletarProduto);
 router.patch("/:id/aprovar", autenticacao, financeiroOuGerente, aprovarProduto);
 router.patch(

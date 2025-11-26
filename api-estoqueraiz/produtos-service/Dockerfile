@@ -28,6 +28,8 @@ COPY --from=builder /build/produtos-service/dist ./dist
 COPY --from=builder /build/produtos-service/package*.json ./
 COPY --from=builder /build/produtos-service/node_modules ./node_modules
 
+RUN mkdir -p /app/uploads
+
 ENV NODE_PATH=/app/shared/node_modules
 
 EXPOSE 3005

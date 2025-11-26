@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
 import { conectarBanco, sequelize } from "../../shared/config/database";
 import { redisClient } from "../../shared/config/redis";
 import { logger } from "../../shared/utils/logger";
@@ -24,6 +25,8 @@ const VERSION = "1.0.0";
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use(metricsMiddleware(SERVICE_NAME));
 
@@ -49,58 +52,51 @@ assinanteEventos.registrarManipulador(
   }
 );
 
-let server: any;
+let servidor: any;
 
-async function gracefulShutdown(signal: string) {
-  logger.info(`Recebido sinal ${signal} - iniciando shutdown graceful`);
-
-  server.close(async () => {
-    logger.info("🔌 Servidor HTTP fechado");
-
-    try {
-      await assinanteEventos.desinscrever();
-      logger.info(" Eventos desincritos");
-
-      await sequelize.close();
-      logger.info("Conexão com banco fechada");
-
-      await redisClient.quit();
-      logger.info("Conexão com Redis fechada");
-
-      logger.info("Shutdown graceful concluído");
-      process.exit(0);
-    } catch (error) {
-      logger.error(" Erro durante shutdown graceful", { error });
-      process.exit(1);
-    }
-  });
-
-  setTimeout(() => {
-    logger.error("Forçando shutdown após timeout de 10s");
-    process.exit(1);
-  }, 10000);
-}
-
-process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-const iniciar = async () => {
+async function iniciar() {
   try {
     await conectarBanco();
-    await redisClient.ping();
+
     await assinanteEventos.inscrever([
       EventosTipo.CATEGORIA_CRIADA,
       EventosTipo.UNIDADE_CRIADA,
     ]);
 
-    server = app.listen(PORT, () => {
-      logger.info(` ${SERVICE_NAME} rodando na porta ${PORT}`);
+    servidor = app.listen(PORT, () => {
+      logger.info(` produtos-service rodando na porta ${PORT}`);
       logger.info(` Métricas disponíveis em http://localhost:${PORT}/metrics`);
       logger.info(`Health check em http://localhost:${PORT}/health`);
     });
   } catch (erro) {
-    logger.error(" Erro ao iniciar servidor:", erro);
+    logger.error("Erro ao iniciar servidor:", erro);
     process.exit(1);
   }
-};
+}
+
+async function desligar() {
+  logger.info("Recebido sinal SIGTERM - iniciando shutdown graceful");
+
+  if (servidor) {
+    servidor.close(() => {
+      logger.info("🔌 Servidor HTTP fechado");
+    });
+  }
+
+  await assinanteEventos.desinscrever();
+  logger.info(" Eventos desincritos");
+
+  await sequelize.close();
+  logger.info("Conexão com banco fechada");
+
+  await redisClient.quit();
+  logger.info("Conexão com Redis fechada");
+
+  logger.info("Shutdown graceful concluído");
+  process.exit(0);
+}
+
+process.on("SIGTERM", desligar);
+process.on("SIGINT", desligar);
 
 iniciar();
