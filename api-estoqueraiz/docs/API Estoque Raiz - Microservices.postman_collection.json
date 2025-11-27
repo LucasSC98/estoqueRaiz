@@ -1,0 +1,2894 @@
+{
+	"info": {
+		"_postman_id": "a70de1a8-da1c-4195-bd47-6005a30c1fb2",
+		"name": "API Estoque Raiz - Microservices",
+		"description": "Sistema de gerenciamento de estoque com arquitetura de microserviços\n\nContact Support:\n Name: Estoque Raiz\n Email: suporte@estoqueraiz.com",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47324562",
+		"_collection_link": "https://chaosalt-icrazy-2873142.postman.co/workspace/Lucas-S's-Workspace~60f8928c-7829-4ff5-8a52-9ffe09f53de1/collection/47324562-a70de1a8-da1c-4195-bd47-6005a30c1fb2?action=share&source=collection_link&creator=47324562"
+	},
+	"item": [
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "auth",
+					"item": [
+						{
+							"name": "login",
+							"item": [
+								{
+									"name": "Realizar login",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"email\": \"chaosalt.icrazy9@gmail.com\",\n  \"senha\": \"Minhasenha3\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/auth/login",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"login"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Login realizado com sucesso",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"email\": \"ViLGuGYM6nHo0I@mfHXiKicIZyWedMfXbUVTdW.ajn\",\n  \"senha\": \"string\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/login",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"login"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"token\": \"string\",\n  \"usuario\": {\n    \"id\": 7495,\n    \"nome\": \"string\",\n    \"email\": \"VrGrlfxCDuUzh65@mNVNqyiAxaNGNd.xqn\",\n    \"cpf\": \"string\",\n    \"cargo\": \"financeiro\",\n    \"unidade_id\": 8558,\n    \"statusUsuario\": \"pendente\",\n    \"criado_em\": \"2006-04-10T05:47:00.135Z\",\n    \"atualizado_em\": \"1956-05-11T15:54:45.976Z\"\n  }\n}"
+										},
+										{
+											"name": "Credenciais invalidas",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"email\": \"ViLGuGYM6nHo0I@mfHXiKicIZyWedMfXbUVTdW.ajn\",\n  \"senha\": \"string\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/login",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"login"
+													]
+												}
+											},
+											"status": "Unauthorized",
+											"code": 401,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"erro\": \"string\",\n  \"status\": 2080,\n  \"timestamp\": \"1968-05-02T20:29:19.136Z\"\n}"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "usuarios",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "aprovar",
+									"item": [
+										{
+											"name": "Aprovar usuario",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{bearerToken}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json",
+														"disabled": true
+													},
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"disabled": true
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJjaGFvc2FsdC5pY3Jhenk5QGdtYWlsLmNvbSIsImNhcmdvIjoiZ2VyZW50ZSIsInVuaWRhZGVfaWQiOjEsImlhdCI6MTc2MzUxMzUyNCwiZXhwIjoxNzYzNTIwNzI0fQ.cM0q-_TUtT0H5QTYpVe7VVCt2gZ3khuwa01VLX5leRU",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"cargo\": \"estoquista\",\n  \"unidade_id\": 1\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/usuarios/:id/aprovar",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"usuarios",
+														":id",
+														"aprovar"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "24"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Usuario aprovado",
+													"originalRequest": {
+														"method": "PATCH",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"cargo\": \"estoquista\",\n  \"unidade_id\": 7262\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/usuarios/:id/aprovar",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"usuarios",
+																":id",
+																"aprovar"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"string\",\n  \"usuario\": {\n    \"id\": 757,\n    \"nome\": \"string\",\n    \"email\": \"qEa@cGgGvoTPiqUUMiiYuDAZEwHQEnHlsAg.gfzl\",\n    \"cpf\": \"string\",\n    \"cargo\": \"estoquista\",\n    \"unidade_id\": 7205,\n    \"statusUsuario\": \"rejeitado\",\n    \"criado_em\": \"2020-05-18T08:39:12.685Z\",\n    \"atualizado_em\": \"1971-12-08T15:27:51.387Z\"\n  }\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "rejeitar",
+									"item": [
+										{
+											"name": "Rejeitar usuario",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{bearerToken}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/usuarios/:id/rejeitar",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"usuarios",
+														":id",
+														"rejeitar"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "2485"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Usuario rejeitado",
+													"originalRequest": {
+														"method": "PATCH",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/usuarios/:id/rejeitar",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"usuarios",
+																":id",
+																"rejeitar"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"string\",\n  \"usuario\": {\n    \"id\": 757,\n    \"nome\": \"string\",\n    \"email\": \"qEa@cGgGvoTPiqUUMiiYuDAZEwHQEnHlsAg.gfzl\",\n    \"cpf\": \"string\",\n    \"cargo\": \"estoquista\",\n    \"unidade_id\": 7205,\n    \"statusUsuario\": \"rejeitado\",\n    \"criado_em\": \"2020-05-18T08:39:12.685Z\",\n    \"atualizado_em\": \"1971-12-08T15:27:51.387Z\"\n  }\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "Buscar usuario por ID",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/usuarios/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"usuarios",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Usuario encontrado",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/usuarios/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"usuarios",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"id\": 6936,\n  \"nome\": \"string\",\n  \"email\": \"6X-9WBjWxMG@kNiqczEEeqU.ik\",\n  \"cpf\": \"string\",\n  \"cargo\": \"gerente\",\n  \"unidade_id\": 5416,\n  \"statusUsuario\": \"aprovado\",\n  \"criado_em\": \"1977-12-26T21:01:16.518Z\",\n  \"atualizado_em\": \"2015-11-20T12:07:56.121Z\"\n}"
+										},
+										{
+											"name": "Usuario nao encontrado",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/usuarios/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"usuarios",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Not Found",
+											"code": 404,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"erro\": \"string\",\n  \"status\": 2080,\n  \"timestamp\": \"1968-05-02T20:29:19.136Z\"\n}"
+										}
+									]
+								},
+								{
+									"name": "Atualizar usuario",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"nome\": \"string\",\n  \"email\": \"string\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/usuarios/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"usuarios",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Usuario atualizado",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"nome\": \"string\",\n  \"email\": \"string\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/usuarios/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"usuarios",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"string\",\n  \"usuario\": {\n    \"id\": 757,\n    \"nome\": \"string\",\n    \"email\": \"qEa@cGgGvoTPiqUUMiiYuDAZEwHQEnHlsAg.gfzl\",\n    \"cpf\": \"string\",\n    \"cargo\": \"estoquista\",\n    \"unidade_id\": 7205,\n    \"statusUsuario\": \"rejeitado\",\n    \"criado_em\": \"2020-05-18T08:39:12.685Z\",\n    \"atualizado_em\": \"1971-12-08T15:27:51.387Z\"\n  }\n}"
+										}
+									]
+								},
+								{
+									"name": "Deletar usuario",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/usuarios/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"usuarios",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Usuario deletado",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/usuarios/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"usuarios",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"string\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Listar todos os usuarios",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/usuarios",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"usuarios"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Lista de usuarios",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/usuarios",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"usuarios"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"id\": 9564,\n    \"nome\": \"string\",\n    \"email\": \"iNJz5VNs88u@emfkrdkAFoFtoYcxEsWbEbe.ulj\",\n    \"cpf\": \"string\",\n    \"cargo\": \"estoquista\",\n    \"unidade_id\": 1316,\n    \"statusUsuario\": \"aprovado\",\n    \"criado_em\": \"1978-10-08T06:25:51.117Z\",\n    \"atualizado_em\": \"2016-07-21T22:34:42.850Z\"\n  },\n  {\n    \"id\": 3161,\n    \"nome\": \"string\",\n    \"email\": \"iYcWy3UbwS@uZFPrVjbNOeXCSWrcJcqVGFdUpwnAysV.yyid\",\n    \"cpf\": \"string\",\n    \"cargo\": \"gerente\",\n    \"unidade_id\": 7385,\n    \"statusUsuario\": \"rejeitado\",\n    \"criado_em\": \"1955-08-30T20:42:47.077Z\",\n    \"atualizado_em\": \"1980-05-31T18:30:49.251Z\"\n  }\n]"
+								},
+								{
+									"name": "Nao autorizado",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/usuarios",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"usuarios"
+											]
+										}
+									},
+									"status": "Unauthorized",
+									"code": 401,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"erro\": \"string\",\n  \"status\": 2080,\n  \"timestamp\": \"1968-05-02T20:29:19.136Z\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Criar novo usuario",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"nome\": \"string\",\n  \"email\": \"uQ6hPuA7t1@TRNolmY.qolk\",\n  \"senha\": \"string\",\n  \"cpf\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/usuarios",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"usuarios"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Usuario criado com sucesso",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"nome\": \"string\",\n  \"email\": \"uQ6hPuA7t1@TRNolmY.qolk\",\n  \"senha\": \"string\",\n  \"cpf\": \"string\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/usuarios",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"usuarios"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"string\",\n  \"usuario\": {\n    \"id\": 757,\n    \"nome\": \"string\",\n    \"email\": \"qEa@cGgGvoTPiqUUMiiYuDAZEwHQEnHlsAg.gfzl\",\n    \"cpf\": \"string\",\n    \"cargo\": \"estoquista\",\n    \"unidade_id\": 7205,\n    \"statusUsuario\": \"rejeitado\",\n    \"criado_em\": \"2020-05-18T08:39:12.685Z\",\n    \"atualizado_em\": \"1971-12-08T15:27:51.387Z\"\n  }\n}"
+								},
+								{
+									"name": "Dados invalidos",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"nome\": \"string\",\n  \"email\": \"uQ6hPuA7t1@TRNolmY.qolk\",\n  \"senha\": \"string\",\n  \"cpf\": \"string\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/usuarios",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"usuarios"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"erro\": \"string\",\n  \"status\": 2080,\n  \"timestamp\": \"1968-05-02T20:29:19.136Z\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "unidades",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Buscar unidade por ID",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/unidades/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"unidades",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Unidade encontrada",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/unidades/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"unidades",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"id\": 3344,\n  \"nome\": \"string\",\n  \"descricao\": \"string\",\n  \"rua\": \"string\",\n  \"numero\": \"string\",\n  \"bairro\": \"string\",\n  \"cidade\": \"string\",\n  \"estado\": \"string\",\n  \"cep\": \"string\",\n  \"criado_em\": \"1991-09-22T02:16:38.490Z\",\n  \"atualizado_em\": \"2024-07-18T08:21:24.550Z\"\n}"
+										}
+									]
+								},
+								{
+									"name": "Atualizar unidade",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"nome\": \"string\",\n  \"descricao\": \"string\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/unidades/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"unidades",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Unidade atualizada",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"nome\": \"string\",\n  \"descricao\": \"string\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/unidades/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"unidades",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Deletar unidade",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/unidades/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"unidades",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Unidade deletada",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/unidades/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"unidades",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Listar todas as unidades",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/unidades",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"unidades"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Lista de unidades",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/unidades",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"unidades"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"id\": 9130,\n    \"nome\": \"string\",\n    \"descricao\": \"string\",\n    \"rua\": \"string\",\n    \"numero\": \"string\",\n    \"bairro\": \"string\",\n    \"cidade\": \"string\",\n    \"estado\": \"string\",\n    \"cep\": \"string\",\n    \"criado_em\": \"1993-05-06T07:09:10.475Z\",\n    \"atualizado_em\": \"2011-07-07T07:35:11.741Z\"\n  },\n  {\n    \"id\": 33,\n    \"nome\": \"string\",\n    \"descricao\": \"string\",\n    \"rua\": \"string\",\n    \"numero\": \"string\",\n    \"bairro\": \"string\",\n    \"cidade\": \"string\",\n    \"estado\": \"string\",\n    \"cep\": \"string\",\n    \"criado_em\": \"2024-11-21T08:06:03.209Z\",\n    \"atualizado_em\": \"1993-11-22T05:52:27.950Z\"\n  }\n]"
+								}
+							]
+						},
+						{
+							"name": "Criar nova unidade",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"nome\": \"string\",\n  \"rua\": \"string\",\n  \"numero\": \"string\",\n  \"bairro\": \"string\",\n  \"cidade\": \"string\",\n  \"estado\": \"string\",\n  \"cep\": \"string\",\n  \"descricao\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/unidades",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"unidades"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Unidade criada",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"nome\": \"string\",\n  \"rua\": \"string\",\n  \"numero\": \"string\",\n  \"bairro\": \"string\",\n  \"cidade\": \"string\",\n  \"estado\": \"string\",\n  \"cep\": \"string\",\n  \"descricao\": \"string\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/unidades",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"unidades"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"string\",\n  \"unidade\": {\n    \"id\": 8467,\n    \"nome\": \"string\",\n    \"descricao\": \"string\",\n    \"rua\": \"string\",\n    \"numero\": \"string\",\n    \"bairro\": \"string\",\n    \"cidade\": \"string\",\n    \"estado\": \"string\",\n    \"cep\": \"string\",\n    \"criado_em\": \"2007-07-27T14:50:59.307Z\",\n    \"atualizado_em\": \"1969-06-25T15:34:48.943Z\"\n  }\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "categorias",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Buscar categoria por ID",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/categorias/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"categorias",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Categoria encontrada",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/categorias/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"categorias",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Atualizar categoria",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/categorias/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"categorias",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Categoria atualizada",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/categorias/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"categorias",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Deletar categoria",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/categorias/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"categorias",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Categoria deletada",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/categorias/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"categorias",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Listar todas as categorias",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/categorias",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"categorias"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Lista de categorias",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/categorias",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"categorias"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"id\": 7855,\n    \"nome\": \"string\",\n    \"descricao\": \"string\",\n    \"criadoEm\": \"2011-10-15T18:04:53.153Z\",\n    \"atualizadoEm\": \"2007-02-22T05:35:28.855Z\"\n  },\n  {\n    \"id\": 3263,\n    \"nome\": \"string\",\n    \"descricao\": \"string\",\n    \"criadoEm\": \"2018-10-07T01:28:06.561Z\",\n    \"atualizadoEm\": \"2015-04-09T09:23:56.443Z\"\n  }\n]"
+								}
+							]
+						},
+						{
+							"name": "Criar nova categoria",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"nome\": \"string\",\n  \"descricao\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/categorias",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"categorias"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Categoria criada",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"nome\": \"string\",\n  \"descricao\": \"string\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/categorias",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"categorias"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "produtos",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "aprovar",
+									"item": [
+										{
+											"name": "Aprovar produto",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{bearerToken}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "PATCH",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/produtos/:id/aprovar",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"produtos",
+														":id",
+														"aprovar"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "2485"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Produto aprovado",
+													"originalRequest": {
+														"method": "PATCH",
+														"header": [
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/produtos/:id/aprovar",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"produtos",
+																":id",
+																"aprovar"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "rejeitar",
+									"item": [
+										{
+											"name": "Rejeitar produto",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{bearerToken}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "PATCH",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/produtos/:id/rejeitar",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"produtos",
+														":id",
+														"rejeitar"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "2485"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Produto rejeitado",
+													"originalRequest": {
+														"method": "PATCH",
+														"header": [
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/produtos/:id/rejeitar",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"produtos",
+																":id",
+																"rejeitar"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "Buscar produto por ID",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/produtos/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"produtos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Produto encontrado",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/produtos/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"produtos",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Atualizar produto",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/produtos/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"produtos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Produto atualizado",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/produtos/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"produtos",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Deletar produto",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/produtos/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"produtos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Produto deletado",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/produtos/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"produtos",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Listar produtos",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/produtos?unidade_id=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"produtos"
+									],
+									"query": [
+										{
+											"key": "unidade_id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Lista de produtos",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/produtos?unidade_id=2485",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"produtos"
+											],
+											"query": [
+												{
+													"key": "unidade_id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"id\": 585,\n    \"nome\": \"string\",\n    \"descricao\": \"string\",\n    \"codigo_barras\": \"string\",\n    \"preco_custo\": 4916.703449789541,\n    \"preco_venda\": 9207.613186302724,\n    \"quantidade_estoque\": 1022,\n    \"quantidade_minima\": 492,\n    \"data_validade\": \"1947-02-08\",\n    \"lote\": \"string\",\n    \"localizacao\": \"string\",\n    \"imagem_url\": \"string\",\n    \"ativo\": false,\n    \"statusProduto\": \"aprovado\",\n    \"categoria_id\": 1490,\n    \"unidade_id\": 3796,\n    \"usuario_id\": 9260,\n    \"criado_em\": \"1955-06-23T19:29:48.138Z\",\n    \"atualizado_em\": \"2010-01-21T10:45:30.433Z\"\n  },\n  {\n    \"id\": 9642,\n    \"nome\": \"string\",\n    \"descricao\": \"string\",\n    \"codigo_barras\": \"string\",\n    \"preco_custo\": 6293.028820587791,\n    \"preco_venda\": 6510.667993509985,\n    \"quantidade_estoque\": 6022,\n    \"quantidade_minima\": 436,\n    \"data_validade\": \"1967-11-06\",\n    \"lote\": \"string\",\n    \"localizacao\": \"string\",\n    \"imagem_url\": \"string\",\n    \"ativo\": true,\n    \"statusProduto\": \"aprovado\",\n    \"categoria_id\": 8203,\n    \"unidade_id\": 4795,\n    \"usuario_id\": 811,\n    \"criado_em\": \"2015-02-05T18:48:44.087Z\",\n    \"atualizado_em\": \"2004-09-23T00:57:23.332Z\"\n  }\n]"
+								}
+							]
+						},
+						{
+							"name": "Criar novo produto",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"nome\": \"string\",\n  \"preco_custo\": 6067.461485878496,\n  \"preco_venda\": 2413.079275615404,\n  \"quantidade_estoque\": 3783,\n  \"quantidade_minima\": 3337,\n  \"categoria_id\": 3656,\n  \"unidade_id\": 5322,\n  \"descricao\": \"string\",\n  \"codigo_barras\": \"string\",\n  \"data_validade\": \"1955-11-05\",\n  \"lote\": \"string\",\n  \"localizacao\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/produtos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"produtos"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Produto criado",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJjaGFvc2FsdC5pY3Jhenk5QGdtYWlsLmNvbSIsImNhcmdvIjoiZ2VyZW50ZSIsInVuaWRhZGVfaWQiOjEsImlhdCI6MTc2MjcyNDE2MCwiZXhwIjoxNzYyNzMxMzYwfQ.R8Tzum3KC0Da8zZfiVT1CSAPbqJmNRM_MwdGG0b8-Io",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"nome\": \"string\",\n  \"preco_custo\": 6067.461485878496,\n  \"preco_venda\": 2413.079275615404,\n  \"quantidade_estoque\": 3783,\n  \"quantidade_minima\": 3337,\n  \"categoria_id\": 3656,\n  \"unidade_id\": 5322,\n  \"descricao\": \"string\",\n  \"codigo_barras\": \"string\",\n  \"data_validade\": \"1955-11-05\",\n  \"lote\": \"string\",\n  \"localizacao\": \"string\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/produtos",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"produtos"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "movimentacoes",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Buscar movimentacao por ID",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/movimentacoes/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"movimentacoes",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "29"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Movimentacao encontrada",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/movimentacoes/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"movimentacoes",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Deletar movimentacao",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/movimentacoes/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"movimentacoes",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "2485"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Movimentacao deletada",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/movimentacoes/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"movimentacoes",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Listar movimentacoes",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/movimentacoes?produto_id=56&unidade_id=1&tipo=TRANSFERENCIA&data_inicio=1991-11-18&data_fim=2026-11-18",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"movimentacoes"
+									],
+									"query": [
+										{
+											"key": "produto_id",
+											"value": "56"
+										},
+										{
+											"key": "unidade_id",
+											"value": "1"
+										},
+										{
+											"key": "tipo",
+											"value": "TRANSFERENCIA"
+										},
+										{
+											"key": "data_inicio",
+											"value": "1991-11-18"
+										},
+										{
+											"key": "data_fim",
+											"value": "2026-11-18"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Lista de movimentacoes",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/movimentacoes?produto_id=2485&unidade_id=2485&tipo=TRANSFERENCIA&data_inicio=1991-11-18&data_fim=1991-11-18",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"movimentacoes"
+											],
+											"query": [
+												{
+													"key": "produto_id",
+													"value": "2485"
+												},
+												{
+													"key": "unidade_id",
+													"value": "2485"
+												},
+												{
+													"key": "tipo",
+													"value": "TRANSFERENCIA"
+												},
+												{
+													"key": "data_inicio",
+													"value": "1991-11-18"
+												},
+												{
+													"key": "data_fim",
+													"value": "1991-11-18"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"id\": 5800,\n    \"tipo\": \"SAIDA\",\n    \"quantidade\": 7576,\n    \"data_movimentacao\": \"1966-01-13T02:44:34.592Z\",\n    \"observacao\": \"string\",\n    \"documento\": \"string\",\n    \"produto_id\": 9635,\n    \"usuario_id\": 692,\n    \"unidade_origem_id\": 7512,\n    \"unidade_destino_id\": 1054,\n    \"criado_em\": \"1987-06-27T04:04:47.103Z\",\n    \"atualizado_em\": \"1961-02-26T03:51:59.055Z\"\n  },\n  {\n    \"id\": 4831,\n    \"tipo\": \"TRANSFERENCIA\",\n    \"quantidade\": 5454,\n    \"data_movimentacao\": \"1987-09-05T00:22:25.610Z\",\n    \"observacao\": \"string\",\n    \"documento\": \"string\",\n    \"produto_id\": 3221,\n    \"usuario_id\": 7789,\n    \"unidade_origem_id\": 6450,\n    \"unidade_destino_id\": 7710,\n    \"criado_em\": \"1980-03-28T10:20:40.112Z\",\n    \"atualizado_em\": \"1990-10-30T07:45:14.080Z\"\n  }\n]"
+								}
+							]
+						},
+						{
+							"name": "Criar nova movimentacao",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"tipo\": \"TRANSFERENCIA\",\n  \"quantidade\": 2,\n  \"produto_id\": 56,\n  \"observacao\": \" \",\n  \"documento\": \" \",\n  \"unidade_origem_id\": 1,\n  \"unidade_destino_id\": 2\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/movimentacoes",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"movimentacoes"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Movimentacao criada",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"tipo\": \"AJUSTE\",\n  \"quantidade\": 5723,\n  \"produto_id\": 2210,\n  \"observacao\": \"string\",\n  \"documento\": \"string\",\n  \"unidade_origem_id\": 2276,\n  \"unidade_destino_id\": 2804\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/movimentacoes",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"movimentacoes"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "relatorios",
+					"item": [
+						{
+							"name": "curva-abc",
+							"item": [
+								{
+									"name": "Gerar relatorio Curva ABC",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/relatorios/curva-abc?data_inicio=1991-11-18&data_fim=2026-11-18&unidade_id=1",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"relatorios",
+												"curva-abc"
+											],
+											"query": [
+												{
+													"key": "data_inicio",
+													"value": "1991-11-18"
+												},
+												{
+													"key": "data_fim",
+													"value": "2026-11-18"
+												},
+												{
+													"key": "unidade_id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Relatorio Curva ABC gerado",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/relatorios/curva-abc?data_inicio=1991-11-18&data_fim=1991-11-18&unidade_id=2485",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"relatorios",
+														"curva-abc"
+													],
+													"query": [
+														{
+															"key": "data_inicio",
+															"value": "1991-11-18"
+														},
+														{
+															"key": "data_fim",
+															"value": "1991-11-18"
+														},
+														{
+															"key": "unidade_id",
+															"value": "2485"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"produtos\": [\n    {\n      \"produto_id\": 7910,\n      \"nome\": \"string\",\n      \"categoria\": \"string\",\n      \"unidade\": \"string\",\n      \"quantidade_vendida\": 3476,\n      \"valor_total\": 8311.516080010171,\n      \"percentual_participacao\": 7393.1428152916005,\n      \"percentual_acumulado\": 1104.995398676716,\n      \"classificacao\": \"C\"\n    },\n    {\n      \"produto_id\": 3248,\n      \"nome\": \"string\",\n      \"categoria\": \"string\",\n      \"unidade\": \"string\",\n      \"quantidade_vendida\": 7072,\n      \"valor_total\": 1629.676934712343,\n      \"percentual_participacao\": 7352.716249280731,\n      \"percentual_acumulado\": 9503.638664578642,\n      \"classificacao\": \"B\"\n    }\n  ],\n  \"resumo\": [\n    {\n      \"classe\": \"B\",\n      \"quantidade_produtos\": 5988,\n      \"valor_total\": 7196.133537651283,\n      \"percentual_valor\": 8740.543211195944,\n      \"percentual_produtos\": 3849.1487840065706\n    },\n    {\n      \"classe\": \"B\",\n      \"quantidade_produtos\": 5139,\n      \"valor_total\": 3990.5002818194266,\n      \"percentual_valor\": 3760.5497137494103,\n      \"percentual_produtos\": 6144.120967287035\n    }\n  ],\n  \"estatisticas\": {\n    \"total_produtos\": 1830,\n    \"valor_total_geral\": 4413.968739006198,\n    \"periodo\": {\n      \"data_inicio\": \"string\",\n      \"data_fim\": \"string\"\n    },\n    \"unidade_id\": \"string\"\n  }\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "estatisticas",
+							"item": [
+								{
+									"name": "Obter estatisticas gerais",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/relatorios/estatisticas?unidade_id=1",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"relatorios",
+												"estatisticas"
+											],
+											"query": [
+												{
+													"key": "unidade_id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Estatisticas obtidas",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/relatorios/estatisticas?unidade_id=2485",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"relatorios",
+														"estatisticas"
+													],
+													"query": [
+														{
+															"key": "unidade_id",
+															"value": "2485"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"estatisticas_gerais\": {}\n}"
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost"
+		}
+	]
+}
