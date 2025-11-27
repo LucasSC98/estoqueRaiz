@@ -1,0 +1,1780 @@
+openapi: 3.0.3
+info:
+  title: API Estoque Raiz - Microservices
+  description: |
+    Sistema de gerenciamento de estoque para Agrológica Agromercantil com arquitetura de microserviços.
+    
+    **Hierarquia de Cargos:**
+    - **Gerente**: Acesso total a todas unidades, aprovação de usuários e produtos, alteração de cargos
+    - **Financeiro**: Aprovação de produtos com definição de preços (não movimenta estoque)
+    - **Estoquista**: Operações de entrada/saída restritas à própria unidade
+    
+    **Regras de Negócio:**
+    - Produtos criados ficam pendentes até aprovação do financeiro/gerente
+    - Movimentações só podem ser feitas por estoquistas/gerentes
+    - Transferências entre unidades exigem permissão
+    - Estoque nunca pode ficar negativo
+  version: 1.0.0
+  contact:
+    name: Estoque Raiz
+    email: suporte@estoqueraiz.com
+
+servers:
+  - url: http://localhost
+    description: Servidor local via Nginx Gateway
+  - url: http://localhost:3001
+    description: Auth Service (direto)
+  - url: http://localhost:3002
+    description: Usuarios Service (direto)
+  - url: http://localhost:3003
+    description: Unidades Service (direto)
+  - url: http://localhost:3004
+    description: Categorias Service (direto)
+  - url: http://localhost:3005
+    description: Produtos Service (direto)
+  - url: http://localhost:3006
+    description: Movimentacoes Service (direto)
+  - url: http://localhost:3007
+    description: Relatorios Service (direto)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT obtido no endpoint /api/auth/login
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        erro:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Mensagem de erro"
+        detalhes:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - senha
+      properties:
+        email:
+          type: string
+          format: email
+          example: "gerente@agrologica.com.br"
+        senha:
+          type: string
+          format: password
+          example: "Senha@123"
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        usuario:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            nome:
+              type: string
+              example: "João Silva"
+            email:
+              type: string
+              example: "gerente@agrologica.com.br"
+            cargo:
+              type: string
+              enum: [gerente, estoquista, financeiro]
+              example: "gerente"
+            unidade_id:
+              type: integer
+              nullable: true
+              example: null
+              description: "Null para gerentes (acesso a todas unidades)"
+
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: "João Silva"
+        email:
+          type: string
+          format: email
+          example: "joao.silva@agrologica.com.br"
+        cpf:
+          type: string
+          example: "123.456.789-00"
+        cargo:
+          type: string
+          enum: [gerente, estoquista, financeiro]
+          example: "estoquista"
+          description: |
+            - **gerente**: Acesso total
+            - **financeiro**: Aprova produtos e define preços
+            - **estoquista**: Movimenta estoque da própria unidade
+        unidade_id:
+          type: integer
+          nullable: true
+          example: 1
+          description: "Null para gerentes"
+        status:
+          type: string
+          enum: [pendente, aprovado, rejeitado]
+          example: "aprovado"
+        criado_em:
+          type: string
+          format: date-time
+        atualizado_em:
+          type: string
+          format: date-time
+
+    CriarUsuarioRequest:
+      type: object
+      required:
+        - nome
+        - email
+        - senha
+        - cpf
+      properties:
+        nome:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: "João Silva"
+        email:
+          type: string
+          format: email
+          example: "joao.silva@agrologica.com.br"
+        senha:
+          type: string
+          format: password
+          minLength: 6
+          example: "Senha@123"
+          description: "Mínimo 6 caracteres, uma letra maiúscula e um número"
+        cpf:
+          type: string
+          pattern: "^[0-9]{3}\\.?[0-9]{3}\\.?[0-9]{3}-?[0-9]{2}$"
+          example: "123.456.789-00"
+
+    AprovarUsuarioRequest:
+      type: object
+      required:
+        - cargo
+        - unidade_id
+      properties:
+        cargo:
+          type: string
+          enum: [gerente, estoquista, financeiro]
+          example: "estoquista"
+          description: |
+            Cargo que será atribuído ao usuário:
+            - **gerente**: Não precisa de unidade_id (acesso total)
+            - **financeiro**: Precisa de unidade_id (aprova produtos)
+            - **estoquista**: Precisa de unidade_id (movimenta estoque)
+        unidade_id:
+          type: integer
+          example: 1
+          description: "Obrigatório para estoquista e financeiro. Null para gerente."
+
+    AlterarCargoRequest:
+      type: object
+      required:
+        - cargo
+      properties:
+        cargo:
+          type: string
+          enum: [gerente, estoquista, financeiro]
+          example: "financeiro"
+          description: "Apenas gerentes podem alterar cargos. Gerente não pode alterar próprio cargo para não-gerente."
+
+    Unidade:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: "Unidade Centro"
+        descricao:
+          type: string
+          example: "Unidade principal - Centro da cidade"
+        rua:
+          type: string
+          example: "Rua das Flores"
+        numero:
+          type: string
+          example: "123"
+        bairro:
+          type: string
+          example: "Centro"
+        cidade:
+          type: string
+          example: "São Paulo"
+        estado:
+          type: string
+          example: "SP"
+        cep:
+          type: string
+          example: "01234-567"
+        criado_em:
+          type: string
+          format: date-time
+        atualizado_em:
+          type: string
+          format: date-time
+
+    CriarUnidadeRequest:
+      type: object
+      required:
+        - nome
+        - rua
+        - numero
+        - bairro
+        - cidade
+        - estado
+        - cep
+      properties:
+        nome:
+          type: string
+          example: "Unidade Centro"
+        descricao:
+          type: string
+          example: "Unidade principal"
+        rua:
+          type: string
+          example: "Rua das Flores"
+        numero:
+          type: string
+          example: "123"
+        bairro:
+          type: string
+          example: "Centro"
+        cidade:
+          type: string
+          example: "São Paulo"
+        estado:
+          type: string
+          example: "SP"
+        cep:
+          type: string
+          example: "01234-567"
+
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: "Fertilizantes"
+        descricao:
+          type: string
+          example: "Fertilizantes para cultivo agrícola"
+        criado_em:
+          type: string
+          format: date-time
+        atualizado_em:
+          type: string
+          format: date-time
+
+    CriarCategoriaRequest:
+      type: object
+      required:
+        - nome
+      properties:
+        nome:
+          type: string
+          example: "Defensivos"
+        descricao:
+          type: string
+          example: "Defensivos agrícolas"
+
+    Produto:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: "Ureia 45%"
+        descricao:
+          type: string
+          example: "Fertilizante nitrogenado"
+        codigo_barras:
+          type: string
+          example: "7891234567890"
+          description: "Único no sistema"
+        preco_custo:
+          type: number
+          format: decimal
+          example: 150.50
+          description: "Definido apenas por financeiro/gerente"
+        preco_venda:
+          type: number
+          format: decimal
+          example: 200.00
+          description: "Definido apenas por financeiro/gerente"
+        quantidade_estoque:
+          type: integer
+          example: 100
+          description: "Nunca pode ficar negativo"
+        quantidade_minima:
+          type: integer
+          example: 20
+          description: "Alerta de estoque baixo"
+        data_validade:
+          type: string
+          format: date
+          example: "2025-12-31"
+          description: "Obrigatório para rastreabilidade"
+        lote:
+          type: string
+          example: "LOTE2024001"
+          description: "Obrigatório para rastreabilidade"
+        localizacao:
+          type: string
+          example: "Corredor A - Prateleira 3"
+        imagem_url:
+          type: string
+          example: "https://storage.com/produtos/ureia.jpg"
+        ativo:
+          type: boolean
+          example: true
+          description: "Soft delete - produtos inativos não aparecem em listagens"
+        status:
+          type: string
+          enum: [pendente, aprovado, rejeitado]
+          example: "pendente"
+          description: |
+            - **pendente**: Aguardando aprovação do financeiro/gerente
+            - **aprovado**: Produto liberado para uso
+            - **rejeitado**: Produto recusado
+        categoria_id:
+          type: integer
+          example: 1
+        unidade_id:
+          type: integer
+          example: 1
+        usuario_id:
+          type: integer
+          example: 2
+          description: "Usuário que criou o produto"
+        criado_em:
+          type: string
+          format: date-time
+        atualizado_em:
+          type: string
+          format: date-time
+
+    CriarProdutoRequest:
+      type: object
+      required:
+        - nome
+        - quantidade_estoque
+        - quantidade_minima
+        - data_validade
+        - lote
+        - categoria_id
+        - unidade_id
+      properties:
+        nome:
+          type: string
+          example: "Ureia 45%"
+        descricao:
+          type: string
+          example: "Fertilizante nitrogenado"
+        codigo_barras:
+          type: string
+          example: "7891234567890"
+        quantidade_estoque:
+          type: integer
+          minimum: 0
+          example: 100
+        quantidade_minima:
+          type: integer
+          minimum: 0
+          example: 20
+        data_validade:
+          type: string
+          format: date
+          example: "2025-12-31"
+        lote:
+          type: string
+          example: "LOTE2024001"
+        localizacao:
+          type: string
+          example: "Corredor A - Prateleira 3"
+        categoria_id:
+          type: integer
+          example: 1
+        unidade_id:
+          type: integer
+          example: 1
+      description: |
+        Produto criado com status "pendente". Preços são definidos apenas na aprovação por financeiro/gerente.
+
+    AprovarProdutoRequest:
+      type: object
+      required:
+        - preco_custo
+        - preco_venda
+      properties:
+        preco_custo:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 150.50
+        preco_venda:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 200.00
+      description: "Apenas financeiro/gerente podem definir preços e aprovar produtos"
+
+    Movimentacao:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        tipo:
+          type: string
+          enum: [ENTRADA, SAIDA, TRANSFERENCIA, AJUSTE]
+          example: "ENTRADA"
+          description: |
+            - **ENTRADA**: Aumenta estoque (+)
+            - **SAIDA**: Reduz estoque (-)
+            - **TRANSFERENCIA**: Move entre unidades
+            - **AJUSTE**: Correção manual de estoque
+        quantidade:
+          type: integer
+          minimum: 1
+          example: 50
+        data_movimentacao:
+          type: string
+          format: date-time
+        observacao:
+          type: string
+          example: "Recebimento de fornecedor XYZ"
+        documento:
+          type: string
+          example: "NF-123456"
+        produto_id:
+          type: integer
+          example: 1
+        usuario_id:
+          type: integer
+          example: 2
+        unidade_origem_id:
+          type: integer
+          nullable: true
+          example: 1
+          description: "Usado em TRANSFERENCIA"
+        unidade_destino_id:
+          type: integer
+          nullable: true
+          example: 2
+          description: "Usado em TRANSFERENCIA"
+        criado_em:
+          type: string
+          format: date-time
+        atualizado_em:
+          type: string
+          format: date-time
+
+    CriarMovimentacaoRequest:
+      type: object
+      required:
+        - tipo
+        - quantidade
+        - produto_id
+      properties:
+        tipo:
+          type: string
+          enum: [ENTRADA, SAIDA, TRANSFERENCIA, AJUSTE]
+          example: "ENTRADA"
+        quantidade:
+          type: integer
+          minimum: 1
+          example: 50
+        observacao:
+          type: string
+          example: "Recebimento de fornecedor"
+        documento:
+          type: string
+          example: "NF-123456"
+        produto_id:
+          type: integer
+          example: 1
+        unidade_origem_id:
+          type: integer
+          example: 1
+          description: "Obrigatório para TRANSFERENCIA"
+        unidade_destino_id:
+          type: integer
+          example: 2
+          description: "Obrigatório para TRANSFERENCIA"
+      description: |
+        **Regras por tipo:**
+        - **ENTRADA**: Aumenta estoque. Requer produto_id e quantidade.
+        - **SAIDA**: Reduz estoque. Verifica se há estoque suficiente.
+        - **TRANSFERENCIA**: Requer unidade_origem_id e unidade_destino_id. Origem ≠ Destino.
+        - **AJUSTE**: Define quantidade exata no estoque. Uso restrito a gerentes.
+        
+        **Permissões:**
+        - Estoquista: Apenas na própria unidade
+        - Financeiro: Sem permissão para movimentar
+        - Gerente: Todas as unidades
+
+    CurvaABC:
+      type: object
+      properties:
+        produtos:
+          type: array
+          items:
+            type: object
+            properties:
+              produto_id:
+                type: integer
+              nome:
+                type: string
+              categoria:
+                type: string
+              unidade:
+                type: string
+              quantidade_vendida:
+                type: integer
+              valor_total:
+                type: number
+              percentual_participacao:
+                type: number
+              percentual_acumulado:
+                type: number
+              classificacao:
+                type: string
+                enum: [A, B, C]
+                description: |
+                  - **A**: 80% do valor (20% dos produtos)
+                  - **B**: 15% do valor (30% dos produtos)
+                  - **C**: 5% do valor (50% dos produtos)
+        resumo:
+          type: array
+          items:
+            type: object
+            properties:
+              classe:
+                type: string
+                enum: [A, B, C]
+              quantidade_produtos:
+                type: integer
+              valor_total:
+                type: number
+              percentual_valor:
+                type: number
+              percentual_produtos:
+                type: number
+        estatisticas:
+          type: object
+          properties:
+            total_produtos:
+              type: integer
+            valor_total_geral:
+              type: number
+            periodo:
+              type: object
+              properties:
+                data_inicio:
+                  type: string
+                  format: date
+                data_fim:
+                  type: string
+                  format: date
+            unidade_id:
+              oneOf:
+                - type: integer
+                - type: string
+                  enum: [todas]
+
+    Estatisticas:
+      type: object
+      properties:
+        estatisticas_gerais:
+          type: object
+          properties:
+            total_produtos:
+              type: integer
+            total_produtos_ativos:
+              type: integer
+            total_categorias:
+              type: integer
+            total_usuarios:
+              type: integer
+            total_unidades:
+              type: integer
+            produtos_estoque_baixo:
+              type: integer
+              description: "Produtos abaixo da quantidade mínima"
+            produtos_vencendo:
+              type: integer
+              description: "Produtos que vencem nos próximos 30 dias"
+            valor_total_estoque:
+              type: number
+        movimentacoes_por_mes:
+          type: array
+          items:
+            type: object
+            properties:
+              mes:
+                type: string
+                example: "2024-01"
+              entradas:
+                type: integer
+              saidas:
+                type: integer
+              transferencias:
+                type: integer
+              ajustes:
+                type: integer
+        produtos_mais_movimentados:
+          type: array
+          items:
+            type: object
+            properties:
+              produto_id:
+                type: integer
+              nome:
+                type: string
+              total_movimentacoes:
+                type: integer
+
+paths:
+  /api/auth/login:
+    post:
+      tags:
+        - Autenticação
+      summary: Realizar login
+      description: Autentica usuário e retorna token JWT válido por 24 horas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login realizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Credenciais inválidas ou usuário não aprovado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                credenciais_invalidas:
+                  value:
+                    erro: true
+                    message: "Email ou senha incorretos"
+                usuario_pendente:
+                  value:
+                    erro: true
+                    message: "Usuário ainda não foi aprovado pelo gerente"
+                usuario_rejeitado:
+                  value:
+                    erro: true
+                    message: "Usuário foi rejeitado"
+
+  /api/usuarios:
+    get:
+      tags:
+        - Usuários
+      summary: Listar todos os usuários
+      description: |
+        **Permissões:**
+        - **Gerente**: Vê todos os usuários de todas unidades
+        - **Financeiro/Estoquista**: Vê apenas usuários da própria unidade
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+        '401':
+          description: Não autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Usuários
+      summary: Criar novo usuário (cadastro público)
+      description: |
+        Registra novo usuário com status "pendente". 
+        Aguarda aprovação de gerente que definirá cargo e unidade.
+        
+        **Validações:**
+        - Email único no sistema
+        - CPF único e válido
+        - Senha mínimo 6 caracteres, letra maiúscula e número
+        - Nome mínimo 3 caracteres
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriarUsuarioRequest'
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Usuário criado com sucesso. Aguardando aprovação do gerente."
+                  usuario:
+                    $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                email_existente:
+                  value:
+                    erro: true
+                    message: "Email já está em uso"
+                cpf_existente:
+                  value:
+                    erro: true
+                    message: "CPF já está em uso"
+                senha_fraca:
+                  value:
+                    erro: true
+                    message: "Senha deve ter pelo menos 6 caracteres, uma letra maiúscula e um número"
+
+  /api/usuarios/pendentes:
+    get:
+      tags:
+        - Usuários
+      summary: Listar usuários pendentes de aprovação
+      description: |
+        **Permissão:** Apenas gerentes
+        
+        Retorna lista de usuários aguardando aprovação
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuários pendentes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/usuarios/{id}:
+    get:
+      tags:
+        - Usuários
+      summary: Buscar usuário por ID
+      description: |
+        **Permissões:**
+        - **Gerente**: Acessa qualquer usuário
+        - **Outros**: Apenas usuários da própria unidade ou próprio perfil
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '403':
+          description: Acesso negado
+        '404':
+          description: Usuário não encontrado
+
+    put:
+      tags:
+        - Usuários
+      summary: Atualizar usuário
+      description: |
+        Permite atualizar nome, email, senha e CPF.
+        
+        **Permissões:**
+        - **Gerente**: Atualiza qualquer usuário
+        - **Outros**: Apenas próprio perfil
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                email:
+                  type: string
+                senha:
+                  type: string
+                cpf:
+                  type: string
+      responses:
+        '200':
+          description: Usuário atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  usuario:
+                    $ref: '#/components/schemas/Usuario'
+
+    delete:
+      tags:
+        - Usuários
+      summary: Deletar usuário
+      description: |
+        **Permissão:** Apenas gerentes
+        
+        Remove usuário do sistema (hard delete)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuário deletado
+        '403':
+          description: Acesso negado
+
+  /api/usuarios/{id}/aprovar:
+    patch:
+      tags:
+        - Usuários
+      summary: Aprovar usuário pendente
+      description: |
+        **Permissão:** Apenas gerentes
+        
+        Aprova usuário definindo cargo e unidade.
+        Envia email de confirmação.
+        
+        **Regras:**
+        - Cargo "gerente" não precisa de unidade_id
+        - Cargos "estoquista" e "financeiro" precisam de unidade_id
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AprovarUsuarioRequest'
+      responses:
+        '200':
+          description: Usuário aprovado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Usuário aprovado com sucesso"
+                  usuario:
+                    $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Usuário já foi processado
+        '403':
+          description: Acesso negado
+        '404':
+          description: Usuário não encontrado
+
+  /api/usuarios/{id}/rejeitar:
+    patch:
+      tags:
+        - Usuários
+      summary: Rejeitar usuário pendente
+      description: |
+        **Permissão:** Apenas gerentes
+        
+        Rejeita cadastro de usuário.
+        Envia email informando rejeição.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuário rejeitado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Usuário rejeitado com sucesso"
+        '400':
+          description: Usuário já foi processado
+        '403':
+          description: Acesso negado
+
+  /api/usuarios/{id}/alterar-cargo:
+    put:
+      tags:
+        - Usuários
+      summary: Alterar cargo de usuário aprovado
+      description: |
+        **Permissão:** Apenas gerentes
+        
+        Altera cargo de usuário já aprovado.
+        
+        **Restrições:**
+        - Gerente não pode alterar próprio cargo para não-gerente
+        - Apenas usuários com status "aprovado" podem ter cargo alterado
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlterarCargoRequest'
+      responses:
+        '200':
+          description: Cargo alterado com sucesso
+        '400':
+          description: Restrição de segurança ou usuário não aprovado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                proprio_cargo:
+                  value:
+                    erro: true
+                    message: "Não é possível alterar seu próprio cargo para não-gerente"
+        '403':
+          description: Acesso negado
+        '404':
+          description: Usuário aprovado não encontrado
+
+  /api/unidades:
+    get:
+      tags:
+        - Unidades
+      summary: Listar todas as unidades
+      description: Retorna lista de unidades ordenadas por nome
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de unidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Unidade'
+
+    post:
+      tags:
+        - Unidades
+      summary: Criar nova unidade
+      description: |
+        **Permissão:** Apenas gerentes
+        
+        Cria nova unidade de estoque.
+        Endereço completo é obrigatório.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriarUnidadeRequest'
+      responses:
+        '201':
+          description: Unidade criada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  unidade:
+                    $ref: '#/components/schemas/Unidade'
+        '400':
+          description: Dados inválidos
+        '403':
+          description: Acesso negado
+
+  /api/unidades/{id}:
+    get:
+      tags:
+        - Unidades
+      summary: Buscar unidade por ID
+      description: |
+        **Permissões:**
+        - **Gerente**: Acessa qualquer unidade
+        - **Outros**: Apenas própria unidade
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Unidade encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unidade'
+        '403':
+          description: Acesso negado
+        '404':
+          description: Unidade não encontrada
+
+    put:
+      tags:
+        - Unidades
+      summary: Atualizar unidade
+      description: |
+        **Permissão:** Apenas gerentes
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                descricao:
+                  type: string
+                rua:
+                  type: string
+                numero:
+                  type: string
+                bairro:
+                  type: string
+                cidade:
+                  type: string
+                estado:
+                  type: string
+                cep:
+                  type: string
+      responses:
+        '200':
+          description: Unidade atualizada
+        '403':
+          description: Acesso negado
+
+    delete:
+      tags:
+        - Unidades
+      summary: Deletar unidade
+      description: |
+        **Permissão:** Apenas gerentes
+        
+        Não permite exclusão se houver produtos associados
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Unidade deletada
+        '400':
+          description: Unidade possui produtos associados
+        '403':
+          description: Acesso negado
+
+  /api/categorias:
+    get:
+      tags:
+        - Categorias
+      summary: Listar todas as categorias
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de categorias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categoria'
+
+    post:
+      tags:
+        - Categorias
+      summary: Criar nova categoria
+      description: CRUD básico sem restrições especiais
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriarCategoriaRequest'
+      responses:
+        '201':
+          description: Categoria criada
+
+  /api/categorias/{id}:
+    get:
+      tags:
+        - Categorias
+      summary: Buscar categoria por ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Categoria encontrada
+
+    put:
+      tags:
+        - Categorias
+      summary: Atualizar categoria
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Categoria atualizada
+
+    delete:
+      tags:
+        - Categorias
+      summary: Deletar categoria
+      description: Hard delete - não possui soft delete
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Categoria deletada
+
+  /api/produtos:
+    get:
+      tags:
+        - Produtos
+      summary: Listar produtos
+      description: |
+        Retorna apenas produtos ativos (ativo=true) e aprovados.
+        
+        **Filtros:**
+        - unidade_id: Filtra por unidade
+        
+        **Permissões:**
+        - **Gerente**: Vê produtos de todas unidades
+        - **Outros**: Apenas produtos da própria unidade
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: unidade_id
+          schema:
+            type: integer
+          description: Filtrar por unidade
+      responses:
+        '200':
+          description: Lista de produtos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Produto'
+
+    post:
+      tags:
+        - Produtos
+      summary: Criar novo produto
+      description: |
+        Cria produto com status "pendente".
+        Preços são definidos apenas na aprovação por financeiro/gerente.
+        
+        **Campos obrigatórios:**
+        - nome, quantidade_estoque, quantidade_minima
+        - data_validade, lote (rastreabilidade)
+        - categoria_id, unidade_id
+        
+        **Permissões:**
+        - **Estoquista**: Cria na própria unidade
+        - **Gerente**: Cria em qualquer unidade
+        - **Financeiro**: Sem permissão para criar
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriarProdutoRequest'
+      responses:
+        '201':
+          description: Produto criado com status pendente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Produto criado com sucesso. Aguardando aprovação do financeiro/gerente."
+                  produto:
+                    $ref: '#/components/schemas/Produto'
+        '400':
+          description: Dados inválidos
+        '403':
+          description: Acesso negado
+
+  /api/produtos/pendentes:
+    get:
+      tags:
+        - Produtos
+      summary: Listar produtos pendentes de aprovação
+      description: |
+        **Permissão:** Apenas financeiro e gerentes
+        
+        Retorna produtos aguardando aprovação com definição de preços
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de produtos pendentes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Produto'
+        '403':
+          description: Acesso negado
+
+  /api/produtos/{id}:
+    get:
+      tags:
+        - Produtos
+      summary: Buscar produto por ID
+      description: |
+        **Permissões:**
+        - **Gerente**: Acessa qualquer produto
+        - **Outros**: Apenas produtos da própria unidade
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Produto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Produto'
+        '403':
+          description: Acesso negado
+        '404':
+          description: Produto não encontrado
+
+    put:
+      tags:
+        - Produtos
+      summary: Atualizar produto
+      description: |
+        Permite atualizar informações básicas.
+        Preços só podem ser alterados por financeiro/gerente.
+        
+        **Permissões:**
+        - **Estoquista**: Atualiza produtos da própria unidade (exceto preços)
+        - **Financeiro/Gerente**: Atualiza qualquer campo
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Produto atualizado
+        '403':
+          description: Acesso negado
+
+    delete:
+      tags:
+        - Produtos
+      summary: Deletar produto (soft delete)
+      description: |
+        Define ativo=false. Produto não aparece mais em listagens ativas.
+        
+        **Permissão:** Apenas gerentes
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Produto desativado
+        '403':
+          description: Acesso negado
+
+  /api/produtos/{id}/aprovar:
+    patch:
+      tags:
+        - Produtos
+      summary: Aprovar produto pendente
+      description: |
+        **Permissão:** Apenas financeiro e gerentes
+        
+        Define preços de custo e venda, aprova produto.
+        Produto passa para status "aprovado" e fica disponível.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AprovarProdutoRequest'
+      responses:
+        '200':
+          description: Produto aprovado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Produto aprovado com sucesso"
+                  produto:
+                    $ref: '#/components/schemas/Produto'
+        '400':
+          description: Produto já foi processado
+        '403':
+          description: Acesso negado
+        '404':
+          description: Produto não encontrado
+
+  /api/produtos/{id}/rejeitar:
+    patch:
+      tags:
+        - Produtos
+      summary: Rejeitar produto pendente
+      description: |
+        **Permissão:** Apenas financeiro e gerentes
+        
+        Rejeita cadastro de produto.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Produto rejeitado
+        '400':
+          description: Produto já foi processado
+        '403':
+          description: Acesso negado
+
+  /api/movimentacoes:
+    get:
+      tags:
+        - Movimentações
+      summary: Listar movimentações
+      description: |
+        Retorna movimentações com filtros opcionais.
+        
+        **Permissões:**
+        - **Gerente**: Vê movimentações de todas unidades
+        - **Estoquista**: Apenas movimentações da própria unidade
+        - **Financeiro**: Sem acesso a movimentações
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: produto_id
+          schema:
+            type: integer
+          description: Filtrar por produto
+        - in: query
+          name: unidade_id
+          schema:
+            type: integer
+          description: Filtrar por unidade
+        - in: query
+          name: tipo
+          schema:
+            type: string
+            enum: [ENTRADA, SAIDA, TRANSFERENCIA, AJUSTE]
+          description: Filtrar por tipo
+        - in: query
+          name: data_inicio
+          schema:
+            type: string
+            format: date
+          description: Data inicial
+        - in: query
+          name: data_fim
+          schema:
+            type: string
+            format: date
+          description: Data final
+      responses:
+        '200':
+          description: Lista de movimentações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movimentacao'
+        '403':
+          description: Acesso negado (financeiro não pode acessar)
+
+    post:
+      tags:
+        - Movimentações
+      summary: Criar nova movimentação
+      description: |
+        Cria movimentação de estoque com validações específicas por tipo.
+        
+        **Regras:**
+        - **ENTRADA**: Aumenta estoque
+        - **SAIDA**: Reduz estoque (verifica disponibilidade)
+        - **TRANSFERENCIA**: Move entre unidades (cria produto no destino se não existir)
+        - **AJUSTE**: Define quantidade exata (apenas gerentes)
+        
+        **Permissões:**
+        - **Estoquista**: Movimenta apenas na própria unidade
+        - **Gerente**: Movimenta em qualquer unidade
+        - **Financeiro**: Sem permissão
+        
+        **Validações:**
+        - Quantidade sempre > 0
+        - Estoque nunca fica negativo
+        - Para TRANSFERENCIA: origem ≠ destino
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriarMovimentacaoRequest'
+      responses:
+        '201':
+          description: Movimentação criada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Movimentação registrada com sucesso"
+                  movimentacao:
+                    $ref: '#/components/schemas/Movimentacao'
+        '400':
+          description: Dados inválidos ou estoque insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                estoque_insuficiente:
+                  value:
+                    erro: true
+                    message: "Estoque insuficiente. Disponível: 10, Solicitado: 50"
+                unidades_iguais:
+                  value:
+                    erro: true
+                    message: "Unidade origem não pode ser igual à unidade destino"
+        '403':
+          description: Acesso negado
+
+  /api/movimentacoes/{id}:
+    get:
+      tags:
+        - Movimentações
+      summary: Buscar movimentação por ID
+      description: |
+        **Permissões:**
+        - **Gerente**: Acessa qualquer movimentação
+        - **Estoquista**: Apenas movimentações da própria unidade
+        - **Financeiro**: Sem acesso
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Movimentação encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movimentacao'
+        '403':
+          description: Acesso negado
+        '404':
+          description: Movimentação não encontrada
+
+    delete:
+      tags:
+        - Movimentações
+      summary: Deletar movimentação
+      description: |
+        **Permissão:** Apenas gerentes
+        
+        Remove movimentação e reverte alteração no estoque
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Movimentação deletada
+        '403':
+          description: Acesso negado
+
+  /api/relatorios/curva-abc:
+    get:
+      tags:
+        - Relatórios
+      summary: Gerar relatório Curva ABC
+      description: |
+        Análise de giro de produtos classificados em:
+        - **Classe A**: 80% do valor (20% dos produtos) - Alta prioridade
+        - **Classe B**: 15% do valor (30% dos produtos) - Média prioridade
+        - **Classe C**: 5% do valor (50% dos produtos) - Baixa prioridade
+        
+        **Filtros:**
+        - Período (data_inicio, data_fim)
+        - Unidade específica ou todas
+        
+        **Permissões:**
+        - **Gerente**: Acessa todas unidades
+        - **Estoquista/Financeiro**: Apenas própria unidade
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: data_inicio
+          schema:
+            type: string
+            format: date
+          description: Data inicial (padrão: 90 dias atrás)
+        - in: query
+          name: data_fim
+          schema:
+            type: string
+            format: date
+          description: Data final (padrão: hoje)
+        - in: query
+          name: unidade_id
+          schema:
+            type: integer
+          description: ID da unidade ou vazio para todas (apenas gerentes)
+      responses:
+        '200':
+          description: Relatório Curva ABC gerado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurvaABC'
+        '403':
+          description: Acesso negado
+
+  /api/relatorios/estatisticas:
+    get:
+      tags:
+        - Relatórios
+      summary: Obter estatísticas gerais do sistema
+      description: |
+        Dashboard com visão geral:
+        - Total de produtos, categorias, usuários
+        - Produtos com estoque baixo
+        - Produtos vencendo (próximos 30 dias)
+        - Valor total em estoque
+        - Movimentações por mês
+        - Produtos mais movimentados
+        
+        **Permissões:**
+        - **Gerente**: Estatísticas de todas unidades
+        - **Outros**: Apenas da própria unidade
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: unidade_id
+          schema:
+            type: integer
+          description: Filtrar por unidade
+      responses:
+        '200':
+          description: Estatísticas obtidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estatisticas'
+        '403':
+          description: Acesso negado
+
+tags:
+  - name: Autenticação
+    description: Endpoints de autenticação e login
+  - name: Usuários
+    description: Gestão de usuários do sistema
+  - name: Unidades
+    description: Gestão de unidades de estoque
+  - name: Categorias
+    description: Gestão de categorias de produtos
+  - name: Produtos
+    description: Gestão de produtos agrícolas
+  - name: Movimentações
+    description: Controle de entrada/saída/transferência de produtos
+  - name: Relatórios
+    description: Relatórios e análises de dados

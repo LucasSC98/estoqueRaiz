@@ -45,5 +45,3 @@ gerar-hash.js
 
 # Docker (opcional - se quiser versionar)
 # docker-compose.override.yml
-
-docs/
